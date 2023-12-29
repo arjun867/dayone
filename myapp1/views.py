@@ -12,8 +12,8 @@ def home(request):
     if 'tasks' not in request.session:
         request.session['tasks'] = []
 
-    completed_tasks = Task.objects.filter(is_completed=True).order_by('-created_time')
-    todos = Task.objects.filter(is_completed=False)
+    completed_tasks = Task.objects.filter(is_completed=True, user=request.user).order_by('-created_time')
+    todos = Task.objects.filter(is_completed=False, user=request.user)
 
     if len(completed_tasks)>15:
         # Get the 15 oldest completed tasks
@@ -28,7 +28,7 @@ def home(request):
 
     if not content:  # Check if content is still empty
         try:
-            todays_entry = JournalEntry.objects.get(date=today)
+            todays_entry = JournalEntry.objects.get(date=today, user=request.user)
             content = todays_entry.content
             request.session["journal_content"] = content  # Store in session for subsequent views
         except JournalEntry.DoesNotExist:
@@ -54,14 +54,14 @@ def add_task(request):
         return redirect('home')
 
 def mark_completed(request, task_id):
-    task = Task.objects.get(id=task_id)
+    task = Task.objects.get(id=task_id, user=request.user)
     task.is_completed = True
     task.save()
 
     return redirect('home')
 
 def remark(request,task_id):
-    task=Task.objects.get(id=task_id)
+    task=Task.objects.get(id=task_id, user=request.user)
     task.is_completed=False
     task.save()
 
@@ -79,7 +79,7 @@ def create_entry(request):
         content = request.POST["content"]
 
         # Check for existing entry and update or create
-        entry, created = JournalEntry.objects.get_or_create(date=today, defaults={"content": content})
+        entry, created = JournalEntry.objects.get_or_create(date=today, user=request.user, defaults={"content": content})
         entry.content = content  # Overwrite content in either case
         entry.save()
 
@@ -91,7 +91,7 @@ def create_entry(request):
         return redirect("home")
 
 def view_all(request):
-    entries = JournalEntry.objects.order_by("-date")
+    entries = JournalEntry.objects.order_by("-date", user=request.user)
     return render(request, "view_all.html", {"entries": entries})
 
 def login_view(request):

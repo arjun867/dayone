@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block title %}journal entries{% endblock%}
+{% block body%}
+<div class="container">
+    <div class="row">
+        <div>
+            <h3>Your Journal Entries</h3>
+            {% for entry in entries %}
+            <h5>{{ entry.date }} ({{ entry.day }})</h5>
+            <p>{{ entry.content }}</p>
+            <button class="btn btn-warning"><a href="{% url 'create_entry' %}?edit={{ entry.pk }}">Edit</a>
+            </button>
+            <!-- <a href="{% url 'create_entry' %}?edit={{ entry.pk }}">Edit</a> -->
+            <hr>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+    
+{% endblock%}

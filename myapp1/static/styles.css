@@ -1,0 +1,37 @@
+
+.brand {
+    font-family:fantasy;
+    color: rgb(3, 152, 3);
+    padding: 2%;
+    margin-top: 2%;
+}
+
+.custom-dpbtn{
+    margin-top: 1%;
+}
+.custom-add{
+    margin-left: 1%;
+}
+.addtask{
+    margin-top: 2%;
+}
+
+footer {
+    margin-top: 1.5%;
+    align-items: center;
+  }
+  
+.footerone,.footertwo,.footerthree,.footerfour {
+  display: block;  
+  text-align: center;
+  padding: 0%;
+  margin: 0; /* Remove all margins */
+}
+footer p {
+    display: inline;
+    text-align: center;
+    padding: 0.5em; /* Add spacing around each p element */
+    margin: 0 0.5em; /* Add additional spacing between p elements */
+    color: rgb(59, 59, 59);
+  }
+  

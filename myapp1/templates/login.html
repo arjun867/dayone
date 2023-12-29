@@ -1,0 +1,29 @@
+{% extends "layout.html"%}
+{% block title%} Log In {% endblock%}
+{% block body%}
+
+<div class="container">
+    <div class="row">
+        <div>
+            <h3>Log In</h3>
+            {% if message %}
+            <div>{{message}}</div>
+            {% endif %}
+            <form action="{% url 'login'%}" method="post">
+                {% csrf_token%}
+
+                <div class="input-group flex-nowrap custom-dpbtn">
+                    <input type="text" name="username" class="form-control"  aria-label="Username" placeholder="Username" aria-describedby="addon-wrapping" autofocus>
+                </div>
+                <div class="input-group flex-nowrap custom-dpbtn">
+                    <input type="password" name="password" class="form-control"  aria-label="Password" placeholder="Password" aria-describedby="addon-wrapping">
+                </div>
+
+                <input type="submit" value="Log In" class="btn btn-primary custom-dpbtn">
+            </form>
+            Don't have an account?<a href="{% url 'register'%}">Register here.</a>
+        </div>
+    </div>
+</div>
+
+{% endblock%}

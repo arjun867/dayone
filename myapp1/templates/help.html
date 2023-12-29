@@ -1,0 +1,49 @@
+{% extends "layout.html"%}
+{% block title%} Help {% endblock%}
+{% block body%}
+<div class="container">
+    <div class="row">
+        <div>
+            <h3>HELP</h3>
+            <p>
+                <h4>Add to home screen</h4>
+                we suggest you to add this web app to your mobile home screen by following the given steps.
+                <ul>
+                    <li>when you open our app on chrome.</li>
+                    <li>you can see three dots on top right of you chrome, click on it.</li>
+                    <li>then you could find 'add to home screen' option ,click on it. </li>
+                    <li>then click on add.</li>
+                    <li>You have successfully added webapp to you home screen.</li>
+                    <li>Now you can have easy access to the web app.</li>
+                </ul>
+               </p>
+            <p>
+            <h4>To-do List</h4>
+            This web app is built for dedicated people like you to make their day productive .
+            Dayone app help you to make todo list regularly and if you finishe the 
+            task you can view the completed task on clicking the completed tasks button ,
+            and you can shift tasks from completed tasks list to tasks list you are not satisfied 
+            about the task you have accomplished, on clicking move to tasks button .  
+           </p>
+           <h4>Journal</h4>
+           <p>
+            You can also write daily journal ,so that you can log you experiences every day .
+            on clicking on text area under the 'write your journal entry' you will be able to enter your
+            experience and if you wish you can even edit the journal on clicking the edit button .
+            you can also view your previous entries on clicking view all link just next to edit button. 
+           </p>
+           <br>
+           <p>
+            You can do all these for free of cost ,just by <span><a href="{% url 'register' %}">registering</a></span> to our app ,
+            we always wecome you to share your valuable <span><a href="mailto:sammengiarjun@gmail.com">feedback</a></span>,because we believe 
+            feedback from dedicated people can help us improve the product.Hope you will be using our app regularly and make your day 
+            super productive. 
+           </p>
+           <p>
+            This is still first version our app , We would consistently improve it. 
+           </p>
+        </div>
+    </div>
+</div>
+
+{% endblock%}

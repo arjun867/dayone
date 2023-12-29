@@ -1,0 +1,40 @@
+{% extends 'layout.html'%}
+{% block title%} Register {% endblock%}
+{% block body%}
+
+<div class="container">
+    <div class="row">
+        <div>
+            <h3>Register</h3>
+            {% if message%}
+            <div>{{message}}</div>
+            {% endif %}
+            <form action="{% url 'register'%}" method="post">
+                {%csrf_token%}
+
+                <div class="input-group flex-nowrap custom-dpbtn">
+                    <input type="text" name="username" class="form-control"  aria-label="Username" placeholder="Username" aria-describedby="addon-wrapping" autofocus>
+                </div>
+                <div class="input-group flex-nowrap custom-dpbtn">
+                    <input type="email" name="email" placeholder="Email" class="form-control"  aria-label="Username"  aria-describedby="addon-wrapping" autofocus>
+                </div>
+                <div class="input-group flex-nowrap custom-dpbtn">
+                    <input type="password" name="password" placeholder="Password" class="form-control"  aria-label="Username"  aria-describedby="addon-wrapping" autofocus>
+                </div>
+                <div class="input-group flex-nowrap custom-dpbtn">
+                    <input type="password" name="confirmation" placeholder="confirmation" class="form-control"  aria-label="Username"  aria-describedby="addon-wrapping" autofocus>
+                </div>  
+                <input type="submit" value="Register" class="btn btn-primary custom-dpbtn">            
+                <!-- <input type="text" name="username" placeholder="Username" autofocus>
+                <input type="email" name="email" placeholder="Email" >
+                <input type="password" name="password" placeholder="Password">
+                <input type="password" name="confirmation" placeholder="confirmation">
+                <input type="submit" value="Register" class="btn btn-primary"> -->
+            </form>
+            Already have an account?<a href="{% url 'login'%}">Log In here.</a>
+        </div>
+    </div>
+</div>
+
+
+{% endblock%}

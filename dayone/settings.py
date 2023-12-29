@@ -143,4 +143,4 @@ STATIC_URL = 'static/'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # settings.py
 AUTH_USER_MODEL = 'myapp1.User'
-SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
+# SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds

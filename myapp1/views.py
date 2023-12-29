@@ -5,6 +5,7 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from django.utils import timezone
 
+from django.contrib.auth.models import AnonymousUser
 
 from .models import User,Task,JournalEntry
 # Create your views here.
@@ -12,8 +13,8 @@ def home(request):
     if 'tasks' not in request.session:
         request.session['tasks'] = []
 
-    completed_tasks = Task.objects.filter(is_completed=True, user=request.user).order_by('-created_time')
-    todos = Task.objects.filter(is_completed=False, user=request.user)
+    completed_tasks = Task.objects.filter(is_completed=True, user=request.user if request.user.is_authenticated else AnonymousUser()).order_by('-created_time')
+    todos = Task.objects.filter(is_completed=False, user=request.user if request.user.is_authenticated else AnonymousUser())
 
     if len(completed_tasks)>15:
         # Get the 15 oldest completed tasks
@@ -49,7 +50,8 @@ def add_task(request):
         request.session['tasks'].append(new_task)
 
         # Create a new Task object for persistence
-        Task.objects.create(title=new_task)
+        user = request.user if request.user.is_authenticated else AnonymousUser()
+        Task.objects.create(title=new_task,user=user)
 
         return redirect('home')
 
@@ -79,7 +81,8 @@ def create_entry(request):
         content = request.POST["content"]
 
         # Check for existing entry and update or create
-        entry, created = JournalEntry.objects.get_or_create(date=today, user=request.user, defaults={"content": content})
+        user = request.user if request.user.is_authenticated else AnonymousUser()
+        entry, created = JournalEntry.objects.get_or_create(date=today, user=user, defaults={"content": content})
         entry.content = content  # Overwrite content in either case
         entry.save()
 
@@ -91,7 +94,7 @@ def create_entry(request):
         return redirect("home")
 
 def view_all(request):
-    entries = JournalEntry.objects.order_by("-date", user=request.user)
+    entries = JournalEntry.objects.order_by("-date", user=request.user if request.user.is_authenticated else AnonymousUser())
     return render(request, "view_all.html", {"entries": entries})
 
 def login_view(request):

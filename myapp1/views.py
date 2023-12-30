@@ -1,99 +1,68 @@
-from django.contrib.auth import authenticate, login, logout
-from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render,redirect
-from django.urls import reverse
+from django.shortcuts import render, redirect
+from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.contrib.auth import authenticate, login, logout
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+from django.db import IntegrityError
 
+from .models import Task, JournalEntry,User
 
-from .models import User,Task,JournalEntry
-# Create your views here.
+@login_required
 def home(request):
-    if 'tasks' not in request.session:
-        request.session['tasks'] = []
-
-    completed_tasks = Task.objects.filter(is_completed=True).order_by('-created_time')
-    todos = Task.objects.filter(is_completed=False)
-
-    if len(completed_tasks)>15:
-        # Get the 15 oldest completed tasks
-        tasks_to_remove = completed_tasks[:len(completed_tasks) - 15]
-
-        # Delete the tasks from the database
-        for task in tasks_to_remove:
-            task.delete()
-     
+    user = request.user
+    todos = Task.objects.filter(users=user, completed=False)
+    completed_tasks = user.tasks.filter(completed=True).order_by('-created_time')[:15]
     today = timezone.localdate()
-    content = request.session.get("journal_content", "")  # Retrieve from session or use empty string
+    content = ""
+    try:
+        today_entry = JournalEntry.objects.get(user=user, date=today)
+        content = today_entry.content
+    except JournalEntry.DoesNotExist:
+        pass
 
-    if not content:  # Check if content is still empty
-        try:
-            todays_entry = JournalEntry.objects.get(date=today)
-            content = todays_entry.content
-            request.session["journal_content"] = content  # Store in session for subsequent views
-        except JournalEntry.DoesNotExist:
-            pass
+    return render(request, 'layout.html', {'todos': todos, 'completed_tasks': completed_tasks, 'content': content})
 
-    context = {
-        'todos': todos,
-        'completed_tasks': completed_tasks,
-        'content':content
-    }
-    return render(request, 'layout.html', context)
-
-
+@login_required
 def add_task(request):
-    
     if request.method == 'POST':
-        new_task = request.POST['task']
-        request.session['tasks'].append(new_task)
-
-        # Create a new Task object for persistence
-        Task.objects.create(title=new_task)
-
+        new_task_title = request.POST.get('task', '')
+        if new_task_title:
+            task = Task.objects.create(title=new_task_title)
+            task.users.add(request.user)
         return redirect('home')
+    return render(request, 'layout.html')
 
+@login_required
 def mark_completed(request, task_id):
     task = Task.objects.get(id=task_id)
     task.is_completed = True
     task.save()
-
     return redirect('home')
 
-def remark(request,task_id):
-    task=Task.objects.get(id=task_id)
-    task.is_completed=False
+@login_required
+def remark(request, task_id):
+    task = Task.objects.get(id=task_id)
+    task.is_completed = False
     task.save()
-
     return redirect('home')
 
-# def delete(request,task_id):
-#     Task.objects.remove(id=task_id)
-#     # task.save()
-#     return redirect('home')
-
+@login_required
 def create_entry(request):
     today = timezone.localdate()
-
     if request.method == "POST":
         content = request.POST["content"]
-
-        # Check for existing entry and update or create
-        entry, created = JournalEntry.objects.get_or_create(date=today, defaults={"content": content})
-        entry.content = content  # Overwrite content in either case
+        entry, created = JournalEntry.objects.get_or_create(date=today, user=request.user)
+        entry.content = content
         entry.save()
-
-        request.session["journal_content"] = content  # Store in session for other views
-
         return redirect("view_all")
     else:
-        # Content will be handled in the home view
         return redirect("home")
 
+@login_required
 def view_all(request):
-    entries = JournalEntry.objects.order_by("-date")
+    entries = JournalEntry.objects.filter(user=request.user).order_by("-date")
     return render(request, "view_all.html", {"entries": entries})
-
 def login_view(request):
     if request.method == "POST":
 

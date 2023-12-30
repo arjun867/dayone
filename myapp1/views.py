@@ -10,7 +10,7 @@ from .models import Task, JournalEntry,User
 
 
 from django.contrib.auth.models import AnonymousUser
-
+from django.contrib.auth import logout
 # @login_required
 
 def home(request):
@@ -24,7 +24,7 @@ def home(request):
     else:
         # Handle the case where the user is logged in
         todos = Task.objects.filter(users=user, completed=False)
-        completed_tasks = user.tasks.filter(completed=True).order_by('-created_time')[:15]
+        completed_tasks = Task.objects.filter(completed=True).order_by('-created_time')[:15]
         today = timezone.localdate()
         content = ""
         try:
@@ -39,15 +39,17 @@ def home(request):
 
 def add_task(request):
     if request.method == 'POST':
-        new_task_title = request.POST.get('task', '')
-        if new_task_title:
+        # new_task_title = request.POST.get('task', '')
+        new_task_title=request.POST["task"]
+        # if new_task_title:
             # Create a new task with the completed field set to False
-            new_task = Task.objects.create(title=new_task_title,completed=False)
-            return HttpResponseRedirect(reverse('home'))
-        else:
-            # Handle case where new_task_title is empty
-            # You might want to add some error handling or display a message to the user
-            pass
+        new_task = Task.objects.create(title=new_task_title,completed=False)
+        new_task.save()
+        return HttpResponseRedirect(reverse('home'))
+    else:
+        # Handle case where new_task_title is empty
+        # You might want to add some error handling or display a message to the user
+        pass
     return HttpResponseRedirect(reverse('home'))
 
 @login_required
@@ -102,7 +104,7 @@ def login_view(request):
 
 def logout_view(request):
     logout(request)
-    return HttpResponseRedirect(reverse("home"))
+    return redirect('register')
 
 
 def register(request):

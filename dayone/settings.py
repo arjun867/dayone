@@ -152,7 +152,10 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'myapp1.User'
 SESSION_COOKIE_AGE = 1209600  # 2 weeks in seconds
 # settings.py
-LOGIN_URL = 'login'  # Assuming 'login' is the name of your login view in urls.py
+LOGIN_URL = '/accounts/login/'  # Assuming 'login' is the name of your login view in urls.py
 # LOGOUT_REDIRECT_URL = 'login'  # Replace with your desired URL
 
+AUTHENTICATION_BACKENDS = [
+    'django.contrib.auth.backends.ModelBackend',
+]
 

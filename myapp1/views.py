@@ -23,8 +23,8 @@ def home(request):
         content = ""
     else:
         # Handle the case where the user is logged in
-        todos = Task.objects.filter(users=user, completed=False)
-        completed_tasks = Task.objects.filter(completed=True).order_by('-created_time')[:15]
+        todos = Task.objects.filter(user=user, completed=False)  # Use filter instead of get
+        completed_tasks = Task.objects.filter(completed=True, user=user).order_by('-created_time')[:15]
         today = timezone.localdate()
         content = ""
         try:
@@ -34,23 +34,16 @@ def home(request):
             pass
 
     return render(request, 'layout.html', {'todos': todos, 'completed_tasks': completed_tasks, 'content': content})
-
 @login_required
 
 def add_task(request):
     if request.method == 'POST':
-        # new_task_title = request.POST.get('task', '')
-        new_task_title=request.POST["task"]
-        # if new_task_title:
+        new_task_title = request.POST.get('task', '')
+        if new_task_title:
             # Create a new task with the completed field set to False
-        new_task = Task.objects.create(title=new_task_title,completed=False)
-        new_task.save()
-        return HttpResponseRedirect(reverse('home'))
-    else:
-        # Handle case where new_task_title is empty
-        # You might want to add some error handling or display a message to the user
-        pass
-    return HttpResponseRedirect(reverse('home'))
+            new_task = Task(title=new_task_title, completed=False, user=request.user)
+            new_task.save()
+    return redirect('home')
 
 @login_required
 def mark_completed(request, task_id):

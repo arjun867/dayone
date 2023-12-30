@@ -9,7 +9,7 @@ class Task(models.Model):
     title = models.CharField(max_length=150)
     created_time = models.DateTimeField(auto_now_add=True)
     completed = models.BooleanField(default=False)  # Add the completed field here
-    users = models.ManyToManyField(User, related_name='tasks')
+    # users = models.ManyToManyField(User, related_name='tasks')
     user = models.ForeignKey(User, on_delete=models.CASCADE, default=None, blank=True, null=True)
 
     def __str__(self):

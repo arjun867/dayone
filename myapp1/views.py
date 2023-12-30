@@ -8,42 +8,59 @@ from django.db import IntegrityError
 
 from .models import Task, JournalEntry,User
 
-@login_required
+
+from django.contrib.auth.models import AnonymousUser
+
+# @login_required
+
 def home(request):
     user = request.user
-    todos = Task.objects.filter(users=user, completed=False)
-    completed_tasks = user.tasks.filter(completed=True).order_by('-created_time')[:15]
-    today = timezone.localdate()
-    content = ""
-    try:
-        today_entry = JournalEntry.objects.get(user=user, date=today)
-        content = today_entry.content
-    except JournalEntry.DoesNotExist:
-        pass
+
+    if isinstance(user, AnonymousUser):
+        # Handle the case where the user is not logged in
+        todos = []
+        completed_tasks = []
+        content = ""
+    else:
+        # Handle the case where the user is logged in
+        todos = Task.objects.filter(users=user, completed=False)
+        completed_tasks = user.tasks.filter(completed=True).order_by('-created_time')[:15]
+        today = timezone.localdate()
+        content = ""
+        try:
+            today_entry = JournalEntry.objects.get(user=user, date=today)
+            content = today_entry.content
+        except JournalEntry.DoesNotExist:
+            pass
 
     return render(request, 'layout.html', {'todos': todos, 'completed_tasks': completed_tasks, 'content': content})
 
 @login_required
+
 def add_task(request):
     if request.method == 'POST':
         new_task_title = request.POST.get('task', '')
         if new_task_title:
-            task = Task.objects.create(title=new_task_title)
-            task.users.add(request.user)
-        return redirect('home')
-    return render(request, 'layout.html')
+            # Create a new task with the completed field set to False
+            new_task = Task.objects.create(title=new_task_title,completed=False)
+            return HttpResponseRedirect(reverse('home'))
+        else:
+            # Handle case where new_task_title is empty
+            # You might want to add some error handling or display a message to the user
+            pass
+    return HttpResponseRedirect(reverse('home'))
 
 @login_required
 def mark_completed(request, task_id):
     task = Task.objects.get(id=task_id)
-    task.is_completed = True
+    task.completed = True
     task.save()
     return redirect('home')
 
 @login_required
 def remark(request, task_id):
     task = Task.objects.get(id=task_id)
-    task.is_completed = False
+    task.completed = False
     task.save()
     return redirect('home')
 
